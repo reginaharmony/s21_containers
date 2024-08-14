@@ -30,7 +30,7 @@ vector<T>::vector(const vector& v) {
   std::copy(v.container_, v.container_ + this->size_, this->container_);
 }
 
-template <typename T>
+template <class T>
 vector<T>::vector(vector&& v)
     : size_(v.size_), capacity_(v.capacity_), container_(v.container_) {
   v.reset();
@@ -43,7 +43,7 @@ vector<T>::~vector() {
 }
 
 template <class T>
-typename s21::vector<T>& vector<T>::operator=(vector&& v) {
+class s21::vector<T>& vector<T>::operator=(vector&& v) {
   if (this == &v) return *this;
   return this->swap(v), *this;
 }
@@ -90,9 +90,9 @@ void vector<T>::clear() {
 
 template <class T>
 typename vector<T>::iterator vector<T>::insert(T* pos, const T& value) {
-  size_type index = pos - container_;
   check_range(pos);
-  reserve(size_ + 1);
+  size_type index = pos - container_;
+  if (size_ + 1 >= capacity_) reallocate(capacity_ * 2, true);
   std::move_backward(container_ + index, container_ + size_,
                      container_ + size_ + 1);
   container_[index] = value, size_++;
@@ -106,21 +106,45 @@ void vector<T>::erase(iterator pos) {
   size_--;
 }
 
-template <class T>
-void vector<T>::push_back(const_reference value) {
-  reserve(size_ + 1), container_[size_] = value, size_++;
+template <class value_type>
+void vector<value_type>::push_back(const_reference value) {
+  if (size_ >= capacity_) reserve(2 * (capacity_ > 0 ? capacity_ : 1));
+  container_[size_++] = value;
 }
 
 template <class T>
 void vector<T>::pop_back() {
-  this->size_ > 0 ? this->size_-- : 0;
+  size_ > 0 ? size_-- : 0;
 }
 
 template <class T>
 void vector<T>::swap(vector& other) noexcept {
-  std::swap(other.size_, this->size_);
-  std::swap(other.capacity_, this->capacity_);
-  std::swap(other.container_, this->container_);
+  std::swap(other.size_, size_);
+  std::swap(other.capacity_, capacity_);
+  std::swap(other.container_, container_);
+}
+
+template <class T>
+template <class... Args>
+typename vector<T>::iterator vector<T>::emplace(const T* pos, Args&&... args) {
+  std::initializer_list<T> items = {args...};
+  std::ptrdiff_t offset = pos - container_;
+  iterator it = const_cast<iterator>(pos);
+  for (const_reference item : items) {
+    it = insert(it, item);
+    it++;
+  }
+
+  return container_ + offset;
+}
+
+template <class T>
+template <class... Args>
+void vector<T>::emplace_back(Args... args) {
+  std::initializer_list<T> items = {args...};
+  for (const_reference item : items) {
+    push_back(item);
+  }
 }
 
 // Supplementary
@@ -128,10 +152,10 @@ void vector<T>::swap(vector& other) noexcept {
 
 template <class T>
 void vector<T>::reset() {
-  this->size_ = this->capacity_ = 0, this->container_ = nullptr;
+  size_ = capacity_ = 0, container_ = nullptr;
 }
 
-template <typename T>
+template <class T>
 void vector<T>::reallocate(size_type size, bool expand) {
   if ((expand && size > capacity_) || (!expand && size < capacity_)) {
     T* temp = new T[size]();
@@ -149,3 +173,43 @@ void vector<T>::check_range(typename vector<T>::iterator pos) {
 }
 
 }  // namespace s21
+
+// template <class T>
+// typename vector<T>::iterator vector<T>::insert(T* pos, const T& value) {
+//   size_type index = pos - container_;
+//   check_range(pos);
+//   reserve(size_ + 1);
+//   std::move_backward(container_ + index, container_ + size_,
+//                      container_ + size_ + 1);
+//   container_[index] = value, size_++;
+//   return &(container_[index]);
+// }
+
+// template <class T>
+// typename vector<T>::iterator vector<T>::insert(T* pos, const T& value) {
+//   size_type index = pos - container_;
+//   check_range(pos);
+//   if (size_ + 1 >= capacity_) reallocate(capacity_ * 2, true);
+//   T replace = container_[index];
+//   size_++;
+//   container_[index] = value;
+//   for (size_type i = index + 1; i < size_; ++i) {
+//     T next = container_[i];
+//     container_[i] = replace;
+//     replace = next;
+//   }
+//   return container_ + index;
+// }
+
+// template <class value_type>
+// void vector<value_type>::expand(size_type size, bool flag) {
+//     // Determine the new capacity
+//     size_type newCapacity = flag ? size : (2 * (capacity_ > 0 ? capacity_ :
+//     2)); iterator tmp = container_; container_ = new value_type[newCapacity];
+//     for (size_t i = 0; i < size_; ++i) {
+//         container_[i] = tmp[i];
+//     }
+
+//     delete[] tmp;
+//     capacity_ = newCapacity;
+// }

@@ -1,11 +1,11 @@
 #ifndef VECTOR_H
 #define VECTOR_H
-#include <cmath>
-#include <initializer_list>
+
+#include <utility>
 
 namespace s21 {
 
-template <class T>
+template <typename T>
 class vector {
  public:
   // Vector Member type
@@ -31,7 +31,7 @@ class vector {
   reference operator[](size_type pos);
   const_reference front();
   const_reference back();
-  T *data();
+  iterator data();
 
   // Vector Modifiers
   void clear();
@@ -50,10 +50,16 @@ class vector {
   // Vector Capacity
   bool empty() const { return size_ == 0; };
   size_type size() const { return size_; };
-  size_type max_size() const { return (SIZE_MAX) / sizeof(T) - 1; };
+  size_type max_size() const { return PTRDIFF_MAX / sizeof(value_type); }
   size_type capacity() const { return capacity_; };
   void reserve(size_type size) { reallocate(size, true); };
   void shrink_to_fit() { reallocate(size_, false); };
+
+  template <typename... Args>
+  iterator emplace(const_iterator pos, Args &&...args);
+
+  template <typename... Args>
+  void emplace_back(Args... args);
 
  private:
   size_type size_;
@@ -62,8 +68,8 @@ class vector {
 
   // Supplementary
   void reset();
-  void reallocate(size_type size, bool expand);
-  void check_range(typename vector<T>::iterator pos);
+  void reallocate(size_type size_new, bool expand);
+  void check_range(iterator pos);
 };
 
 }  // namespace s21
