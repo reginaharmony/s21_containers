@@ -205,7 +205,8 @@ TEST(VectorTest, Clear) {
   EXPECT_EQ(s21_vector.size(), std_vector.size());
 }
 
-// ========================== SET 2 =================================
+// ========================== SET 2
+// ======================================================
 
 // VECTOR
 TEST(VectorTest, Constructor_default) {
@@ -788,6 +789,9 @@ TEST(VectorTest, Helpers_add_memotysize_3) {
 
   EXPECT_EQ(s21_v.size(), n + 3);
 }
+
+// ========================== SET 3
+// ======================================================
 // >>>>>>> VECTOR <<<<<<<<
 
 class Test_vector {

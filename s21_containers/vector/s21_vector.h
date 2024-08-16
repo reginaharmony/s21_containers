@@ -55,9 +55,9 @@ class vector {
   void reserve(size_type size) { reallocate(size, true); };
   void shrink_to_fit() { reallocate(size_, false); };
 
+  // Bonus part
   template <typename... Args>
   iterator emplace(const_iterator pos, Args &&...args);
-
   template <typename... Args>
   void emplace_back(Args... args);
 

@@ -31,9 +31,8 @@ vector<T>::vector(const vector& v) {
 }
 
 template <class T>
-vector<T>::vector(vector&& v)
-    : size_(v.size_), capacity_(v.capacity_), container_(v.container_) {
-  v.reset();
+vector<T>::vector(vector&& v) {
+  this->swap(v), v.reset();
 }
 
 template <class T>
@@ -45,7 +44,9 @@ vector<T>::~vector() {
 template <class T>
 class s21::vector<T>& vector<T>::operator=(vector&& v) {
   if (this == &v) return *this;
-  return this->swap(v), *this;
+  if (this->container_) delete[] this->container_;
+  this->reset(), this->swap(v), v.reset();
+  return *this;
 }
 
 // Vector Element access
@@ -59,19 +60,19 @@ typename vector<T>::reference vector<T>::at(size_type pos) {
 
 template <class T>
 typename vector<T>::reference vector<T>::operator[](size_type pos) {
-  if (pos >= size()) throw std::out_of_range("Index out of range");
+  if (pos >= size_) throw std::out_of_range("Index out of range");
   return container_[pos];
 }
 
 template <class T>
 typename vector<T>::const_reference vector<T>::front() {
-  if (empty()) throw std::out_of_range("Out of range");
+  if (empty()) throw std::out_of_range("Index out of range");
   return *container_;
 }
 
 template <class T>
 typename vector<T>::const_reference vector<T>::back() {
-  if (empty()) throw std::out_of_range("Out of range");
+  if (empty()) throw std::out_of_range("Index out of range");
   return *(container_ + size_ - 1);
 }
 
@@ -85,7 +86,7 @@ typename vector<T>::iterator vector<T>::data() {
 
 template <class T>
 void vector<T>::clear() {
-  this->size_ = 0;
+  size_ = 0;
 }
 
 template <class T>
@@ -124,22 +125,23 @@ void vector<T>::swap(vector& other) noexcept {
   std::swap(other.container_, container_);
 }
 
+// Bonus part
+// =================================================================
+
 template <class T>
 template <class... Args>
 typename vector<T>::iterator vector<T>::emplace(const T* pos, Args&&... args) {
-  std::initializer_list<T> items = {args...};
-  std::ptrdiff_t offset = pos - container_;
-  iterator it = const_cast<iterator>(pos);
-  for (const_reference item : items) it = insert(it, item), it++;
-  
-  return container_ + offset;
+  size_type index = pos - container_;
+  T item(std::forward<Args>(args)...);
+  iterator it = begin();
+  std::advance(it, index), insert(it, std::move(item));
+  return container_ + index;
 }
 
 template <class T>
 template <class... Args>
 void vector<T>::emplace_back(Args... args) {
-  std::initializer_list<T> items = {args...};
-  for (const_reference item : items) push_back(item);
+  push_back(T(std::forward<Args>(args)...));
 }
 
 // Supplementary
