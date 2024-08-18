@@ -205,8 +205,7 @@ TEST(VectorTest, Clear) {
   EXPECT_EQ(s21_vector.size(), std_vector.size());
 }
 
-// ========================== SET 2
-// ======================================================
+// ========================== SET 2 =================================
 
 // VECTOR
 TEST(VectorTest, Constructor_default) {
@@ -232,7 +231,7 @@ TEST(VectorTest, Constructor_n_throw) {
     FAIL() << "Expected std::out_of_range";
   } catch (std::out_of_range const& err) {
     EXPECT_EQ(err.what(),
-              std::string("cannot create s21::vector larger than max_size()"));
+              std::string("Size limit exception"));
   }
 }
 
@@ -790,8 +789,7 @@ TEST(VectorTest, Helpers_add_memotysize_3) {
   EXPECT_EQ(s21_v.size(), n + 3);
 }
 
-// ========================== SET 3
-// ======================================================
+// ========================== SET 3 =================================
 // >>>>>>> VECTOR <<<<<<<<
 
 class Test_vector {

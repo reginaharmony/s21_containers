@@ -4,7 +4,7 @@ TEST_FLAGS = -lgtest -lgmock -pthread -lgtest_main
 LIBS = -lstdc++ -lgtest
 LIN= -lrt -lpthread -lm 
 INCLUDE = s21_containers
-TEST_FILES = test_vector.cc
+TEST_FILES = test_list.cc
 
 all: test
 

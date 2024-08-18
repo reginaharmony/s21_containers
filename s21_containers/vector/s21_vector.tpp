@@ -10,8 +10,7 @@ vector<T>::vector() {
 
 template <class T>
 vector<T>::vector(size_type n) {
-  if (this->max_size() < n)
-    throw std::out_of_range("cannot create s21::vector larger than max_size()");
+  if (this->max_size() < n) throw std::out_of_range("Size limit exception");
   this->size_ = this->capacity_ = n, this->container_ = new T[n];
 }
 
